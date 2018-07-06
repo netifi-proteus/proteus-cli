@@ -1,0 +1,36 @@
+{
+  "name": "proteus-cli",
+  "repository": "https://github.com/netifi-proteus/proteus-cli",
+  "version": "0.0.1",
+  "description": "Command Line Interface for Proteus",
+  "contributors": [
+    "Ryland Degnan <ryland@netifi.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/netifi-proteus/proteus-cli/issues"
+  },
+  "keywords": [
+    "rsocket",
+    "proteus",
+    "protobuf"
+  ],
+  "bin": {
+    "proteus-cli": "./bin/proteus-cli.js"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "test": "mocha",
+    "proteus-cli": "node $NODE_DEBUG_OPTION ./bin/proteus-cli.js"
+  },
+  "dependencies": {
+    "colors": "^1.3.0",
+    "commander": "^2.16.0",
+    "eval": "^0.1.2",
+    "proteus-js-client": "^0.0.5",
+    "rsocket-tcp-client": "^0.0.7"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
+  }
+}
