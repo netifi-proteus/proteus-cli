@@ -265,6 +265,11 @@ program
     });
   });
 
+program.on('command:*', command => {
+  console.error('Invalid command: %s\nSee --help for a list of available commands.', command);
+  process.exit(1);
+});
+
 program.parse(process.argv);
 
 if (!program.args.length) {

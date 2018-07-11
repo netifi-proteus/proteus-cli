@@ -15,3 +15,8 @@ program.parse(process.argv);
 if (!program.args.length) {
   program.help();
 }
+
+if (!program._execs[program.args[0]]) {
+  console.error('Invalid command: %s\nSee --help for a list of available commands.', program.args.join(' '));
+  process.exit(1);
+}
