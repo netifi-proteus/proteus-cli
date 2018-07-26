@@ -7,7 +7,7 @@ let program = require('commander');
 program
   .version(require('../package.json').version)
   .command('info', 'the broker info service')
-  .command('mgmt', 'the broker management service')
+  .command('access', 'the broker access key service')
   .allowUnknownOption(true);
 
 program.parse(process.argv);
