@@ -16,7 +16,10 @@ program
   .version(require('../package.json').version)
   .option('-a, --address <host:port>', 'the address of the broker to connect to (required)', process.env.PROTEUS_ADDRESS)
   .option('-k, --key <number>', 'the access key (required)', process.env.PROTEUS_KEY)
-  .option('-t, --token <string>', 'the access token (required)', process.env.PROTEUS_TOKEN);
+  .option('-t, --token <string>', 'the access token (required)', process.env.PROTEUS_TOKEN)
+  .option('--accessKey <number>', 'the access key')
+  .option('--accessToken <string>', 'the access token')
+  .option('--accessDescription <string>', 'the access description');
 
 program.parseOptions(process.argv);
 
@@ -102,6 +105,108 @@ program
       } catch (e) {
         reject(e);
       }
+    });
+  });
+
+program
+  .command('add')
+  .description('add access key')
+  .action(() => {
+    program.promise = new Promise((resolve, reject) => {
+      if (!program.accessKey) {
+        console.log('\nError: `accessKey` is required');
+        program.help();
+      }
+
+      if (!program.accessToken) {
+        console.log('\nError: `accessToken` is required');
+        program.help();
+      }
+
+      const token = new proteus_js_client.AccessToken();
+      token.setKey(program.accessKey);
+      token.setAccesstoken(program.accessToken);
+      token.setDescription(program.accessDescription);
+
+      accessKeyInfo
+        .addAccessKey(token, Buffer.alloc(0))
+        .subscribe(singleSubscriber(resolve, reject));
+    });
+  });
+
+program
+  .command('remove')
+  .description('remove access key')
+  .action(() => {
+    program.promise = new Promise((resolve, reject) => {
+      if (!program.accessKey) {
+        console.log('\nError: `accessKey` is required');
+        program.help();
+      }
+
+      const key = new proteus_js_client.AccessKey();
+      key.setKey(program.accessKey);
+
+      accessKeyInfo
+        .removeAccessKey(key, Buffer.alloc(0))
+        .subscribe(singleSubscriber(resolve, reject));
+    });
+  });
+
+program
+  .command('disable')
+  .description('disable access key')
+  .action(() => {
+    program.promise = new Promise((resolve, reject) => {
+      if (!program.accessKey) {
+        console.log('\nError: `accessKey` is required');
+        program.help();
+      }
+
+      const key = new proteus_js_client.AccessKey();
+      key.setKey(program.accessKey);
+
+      accessKeyInfo
+        .disableAccessKey(key, Buffer.alloc(0))
+        .subscribe(singleSubscriber(resolve, reject));
+    });
+  });
+
+program
+  .command('enable')
+  .description('enable access key')
+  .action(() => {
+    program.promise = new Promise((resolve, reject) => {
+      if (!program.accessKey) {
+        console.log('\nError: `accessKey` is required');
+        program.help();
+      }
+
+      const key = new proteus_js_client.AccessKey();
+      key.setKey(program.accessKey);
+
+      accessKeyInfo
+        .enableAccessKey(key, Buffer.alloc(0))
+        .subscribe(singleSubscriber(resolve, reject));
+    });
+  });
+
+program
+  .command('key')
+  .description('retrieve access key')
+  .action(() => {
+    program.promise = new Promise((resolve, reject) => {
+      if (!program.accessKey) {
+        console.log('\nError: `accessKey` is required');
+        program.help();
+      }
+
+      const key = new proteus_js_client.AccessKey();
+      key.setKey(program.accessKey);
+
+      accessKeyInfo
+        .getAccessKey(key, Buffer.alloc(0))
+        .subscribe(singleSubscriber(resolve, reject));
     });
   });
 
