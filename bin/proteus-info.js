@@ -9,6 +9,7 @@ let proteus_js_client = require('proteus-js-client');
 let rsocket_tcp_client = require('rsocket-tcp-client');
 let rsocket_core = require('rsocket-core');
 let rsocket_frame = require('rsocket-core/build/RSocketFrame');
+let empty_pb = require('google-protobuf/google/protobuf/empty_pb');
 
 program
   .version(require('../package.json').version)
@@ -89,7 +90,7 @@ program
   .action(() => {
     program.promise = new Promise((resolve, reject) => {
       brokerInfo
-        .brokers(new proteus_js_client.Empty(), Buffer.alloc(0))
+        .brokers(new empty_pb.Empty(), Buffer.alloc(0))
         .subscribe(flowableSubscriber(resolve, reject));
     });
   });
