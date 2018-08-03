@@ -13,9 +13,9 @@ let empty_pb = require('google-protobuf/google/protobuf/empty_pb');
 
 program
   .version(require('../package.json').version)
-  .option('-a, --address <host:port>', 'the address of the broker to connect to (required)', process.env.PROTEUS_ADDRESS)
-  .option('-k, --key <number>', 'the access key (required)', process.env.PROTEUS_KEY)
-  .option('-t, --token <string>', 'the access token (required)', process.env.PROTEUS_TOKEN)
+  .option('--address <host:port>', 'the address of the broker to connect to (required)', process.env.PROTEUS_ADDRESS)
+  .option('--adminKey <number>', 'the admin key (required)', process.env.PROTEUS_KEY)
+  .option('--adminToken <string>', 'the admin token (required)', process.env.PROTEUS_TOKEN)
   .option('-b, --broker <string>', 'the broker id')
   .option('-g, --group <string>', 'the group name')
   .option('-d, --destination <string>', 'the destination name');
@@ -27,13 +27,13 @@ if (!program.address || program.address.indexOf(':') < 0) {
   program.help();
 }
 
-if (!program.key) {
-  console.log('\nError: `key` is required');
+if (!program.adminKey) {
+  console.log('\nError: `adminKey` is required');
   program.help();
 }
 
-if (!program.token) {
-  console.log('\nError: `token` is required');
+if (!program.adminToken) {
+  console.log('\nError: `adminToken` is required');
   program.help();
 }
 
@@ -44,8 +44,8 @@ const connection = new rsocket_tcp_client.default({host, port}, rsocket_core.Buf
 const proteus = proteus_js_client.Proteus.create({
   setup: {
     group: 'proteus-cli',
-    accessKey: program.key,
-    accessToken: program.token,
+    accessKey: program.adminKey,
+    accessToken: program.adminToken,
   },
   transport: {
     connection

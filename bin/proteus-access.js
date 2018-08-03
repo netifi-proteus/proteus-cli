@@ -14,12 +14,11 @@ let crypto = require('crypto');
 
 program
   .version(require('../package.json').version)
-  .option('-a, --address <host:port>', 'the address of the broker to connect to (required)', process.env.PROTEUS_ADDRESS)
-  .option('-k, --key <number>', 'the access key (required)', process.env.PROTEUS_KEY)
-  .option('-t, --token <string>', 'the access token (required)', process.env.PROTEUS_TOKEN)
-  .option('--accessKey <number>', 'the access key')
-  .option('--accessToken <string>', 'the access token')
-  .option('--accessDescription <string>', 'the access description');
+  .option('--address <host:port>', 'the address of the broker to connect to (required)', process.env.PROTEUS_ADDRESS)
+  .option('--adminKey <number>', 'the admin key (required)', process.env.PROTEUS_KEY)
+  .option('--adminToken <string>', 'the admin token (required)', process.env.PROTEUS_TOKEN)
+  .option('-k, --key <number>', 'the access key')
+  .option('-d, --description <string>', 'the access key description');
 
 program.parseOptions(process.argv);
 
@@ -28,13 +27,13 @@ if (!program.address || program.address.indexOf(':') < 0) {
   program.help();
 }
 
-if (!program.key) {
-  console.log('\nError: `key` is required');
+if (!program.adminKey) {
+  console.log('\nError: `adminKey` is required');
   program.help();
 }
 
-if (!program.token) {
-  console.log('\nError: `token` is required');
+if (!program.adminToken) {
+  console.log('\nError: `adminToken` is required');
   program.help();
 }
 
@@ -45,8 +44,8 @@ const connection = new rsocket_tcp_client.default({host, port}, rsocket_core.Buf
 const proteus = proteus_js_client.Proteus.create({
   setup: {
     group: 'proteus-cli',
-    accessKey: program.key,
-    accessToken: program.token,
+    accessKey: program.adminKey,
+    accessToken: program.adminToken,
   },
   transport: {
     connection
@@ -109,27 +108,15 @@ program
   });
 
 program
-  .command('add')
-  .description('add access key')
+  .command('create')
+  .description('create access key')
   .action(() => {
     program.promise = new Promise((resolve, reject) => {
-      if (!program.accessKey) {
-        console.log('\nError: `accessKey` is required');
-        program.help();
-      }
-
-      if (!program.accessToken) {
-        console.log('\nError: `accessToken` is required');
-        program.help();
-      }
-
-      const token = new proteus_js_client.AccessToken();
-      token.setKey(program.accessKey);
-      token.setAccesstoken(program.accessToken);
-      token.setDescription(program.accessDescription);
+      const params = new proteus_js_client.AccessKeyParameters();
+      params.setDescription(program.description);
 
       accessKeyInfo
-        .addAccessKey(token, Buffer.alloc(0))
+        .createAccessKey(token, Buffer.alloc(0))
         .subscribe(singleSubscriber(resolve, reject));
     });
   });
@@ -139,13 +126,13 @@ program
   .description('remove access key')
   .action(() => {
     program.promise = new Promise((resolve, reject) => {
-      if (!program.accessKey) {
-        console.log('\nError: `accessKey` is required');
+      if (!program.key) {
+        console.log('\nError: `key` is required');
         program.help();
       }
 
       const key = new proteus_js_client.AccessKey();
-      key.setKey(program.accessKey);
+      key.setKey(program.key);
 
       accessKeyInfo
         .removeAccessKey(key, Buffer.alloc(0))
@@ -158,13 +145,13 @@ program
   .description('disable access key')
   .action(() => {
     program.promise = new Promise((resolve, reject) => {
-      if (!program.accessKey) {
-        console.log('\nError: `accessKey` is required');
+      if (!program.key) {
+        console.log('\nError: `key` is required');
         program.help();
       }
 
       const key = new proteus_js_client.AccessKey();
-      key.setKey(program.accessKey);
+      key.setKey(program.key);
 
       accessKeyInfo
         .disableAccessKey(key, Buffer.alloc(0))
@@ -177,13 +164,13 @@ program
   .description('enable access key')
   .action(() => {
     program.promise = new Promise((resolve, reject) => {
-      if (!program.accessKey) {
-        console.log('\nError: `accessKey` is required');
+      if (!program.key) {
+        console.log('\nError: `key` is required');
         program.help();
       }
 
       const key = new proteus_js_client.AccessKey();
-      key.setKey(program.accessKey);
+      key.setKey(program.key);
 
       accessKeyInfo
         .enableAccessKey(key, Buffer.alloc(0))
@@ -196,13 +183,13 @@ program
   .description('retrieve access key')
   .action(() => {
     program.promise = new Promise((resolve, reject) => {
-      if (!program.accessKey) {
-        console.log('\nError: `accessKey` is required');
+      if (!program.key) {
+        console.log('\nError: `key` is required');
         program.help();
       }
 
       const key = new proteus_js_client.AccessKey();
-      key.setKey(program.accessKey);
+      key.setKey(program.key);
 
       accessKeyInfo
         .getAccessKey(key, Buffer.alloc(0))
