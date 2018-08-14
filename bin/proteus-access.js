@@ -222,6 +222,13 @@ if (!program.args.length) {
 if (program.promise) {
   spinner.start();
   program.promise
-    .then(() => spinner.succeed(), error => spinner.fail(error.message))
-    .finally(() => proteus.close());
+    .then(
+      () => {
+        spinner.succeed();
+        proteus.close();
+      },
+      error => {
+        spinner.fail(error.message);
+        proteus.close();
+      });
 }
