@@ -6,11 +6,10 @@ let program = require('commander');
 let ora = require('ora');
 
 let proteus_js_client = require('proteus-js-client');
-let rsocket_tcp_client = require('rsocket-tcp-client');
-let rsocket_core = require('rsocket-core');
 let rsocket_frame = require('rsocket-core/build/RSocketFrame');
 let empty_pb = require('google-protobuf/google/protobuf/empty_pb');
 let crypto = require('crypto');
+let ws = require('ws');
 
 program
   .version(require('../package.json').version)
@@ -18,7 +17,7 @@ program
   .option('--adminKey <number>', 'the admin key (required)', process.env.PROTEUS_KEY)
   .option('--adminToken <string>', 'the admin token (required)', process.env.PROTEUS_TOKEN)
   .option('-k, --key <number>', 'the access key')
-  .option('-d, --description <string>', 'the access key description');
+  .option('-d, --keyDescription <string>', 'the access key description');
 
 program.parseOptions(process.argv);
 
@@ -37,9 +36,6 @@ if (!program.adminToken) {
   program.help();
 }
 
-const [host, port] = program.address.split(':');
-const connection = new rsocket_tcp_client.default({host, port}, rsocket_core.BufferEncoders);
-
 // This Proteus object acts as our gateway to both send messages to services and to register services that we support
 const proteus = proteus_js_client.Proteus.create({
   setup: {
@@ -48,7 +44,11 @@ const proteus = proteus_js_client.Proteus.create({
     accessToken: program.adminToken,
   },
   transport: {
-    connection
+    url: 'wss://' + program.address,
+    wsCreator: url =>
+      new ws(url, {
+        rejectUnauthorized: false,
+      }),
   },
 });
 
@@ -113,10 +113,10 @@ program
   .action(() => {
     program.promise = new Promise((resolve, reject) => {
       const params = new proteus_js_client.AccessKeyParameters();
-      params.setDescription(program.description);
+      params.setDescription(program.keyDescription);
 
       accessKeyInfo
-        .createAccessKey(token, Buffer.alloc(0))
+        .createAccessKey(params, Buffer.alloc(0))
         .subscribe(singleSubscriber(resolve, reject));
     });
   });
