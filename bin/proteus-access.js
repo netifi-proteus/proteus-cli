@@ -16,6 +16,7 @@ program
   .option('--address <host:port>', 'the address of the broker to connect to (required)', process.env.PROTEUS_ADDRESS)
   .option('--adminKey <number>', 'the admin key (required)', process.env.PROTEUS_KEY)
   .option('--adminToken <string>', 'the admin token (required)', process.env.PROTEUS_TOKEN)
+  .option('--no-ssl', 'disable ssl')
   .option('-k, --key <number>', 'the access key')
   .option('-d, --keyDescription <string>', 'the access key description');
 
@@ -44,7 +45,7 @@ const proteus = proteus_js_client.Proteus.create({
     accessToken: program.adminToken,
   },
   transport: {
-    url: 'wss://' + program.address,
+    url: (program.ssl ? 'wss://' : 'ws://') + program.address,
     wsCreator: url =>
       new ws(url, {
         rejectUnauthorized: false,
@@ -223,12 +224,10 @@ if (program.promise) {
   spinner.start();
   program.promise
     .then(
-      () => {
-        spinner.succeed();
-        proteus.close();
-      },
-      error => {
-        spinner.fail(error.message);
-        proteus.close();
-      });
+      () => spinner.succeed(),
+      error => spinner.fail(error.message))
+    .then(() => {
+      proteus.close();
+      process.exit(1);
+    });
 }
