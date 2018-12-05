@@ -90,7 +90,6 @@ program
   .description('list brokers')
   .action(() => {
     program.promise = new Promise((resolve, reject) => {
-      console.log('fetching brokers...');
       brokerInfo
         .brokers(new empty_pb.Empty(), Buffer.alloc(0))
         .subscribe(flowableSubscriber(resolve, reject));
