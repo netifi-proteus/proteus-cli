@@ -53,7 +53,7 @@ const proteus = proteus_js_client.Proteus.create({
   },
 });
 
-const rSocket = proteus.group('com.netifi.proteus.admin.brokerServices');
+const rSocket = proteus.group('com.netifi.proteus.brokerServices');
 const brokerInfo = new proteus_js_client.BrokerInfoServiceClient(rSocket);
 
 const spinner = ora();
@@ -90,6 +90,7 @@ program
   .description('list brokers')
   .action(() => {
     program.promise = new Promise((resolve, reject) => {
+      console.log('fetching brokers...');
       brokerInfo
         .brokers(new empty_pb.Empty(), Buffer.alloc(0))
         .subscribe(flowableSubscriber(resolve, reject));
@@ -283,7 +284,10 @@ if (program.promise) {
   program.promise
     .then(
       () => spinner.succeed(),
-      error => spinner.fail(error.message))
+      error => {
+        spinner.fail();
+        console.error(error);
+      })
     .then(() => {
       proteus.close();
       process.exit(1);
